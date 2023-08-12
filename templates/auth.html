@@ -1,0 +1,147 @@
+{% include "separate/header.html" %}
+    <div class="auth shadow-lg mb-5 d-flex flex-column bd-highlight mb-3">
+      <div class="auth-header d-flex justify-content-between">
+        <div class="mt-1">
+          <h6 class="ms-2">Cochalate V.1.1 (Demo)</h6>
+        </div>
+        <div class="mt-1">
+          <div class="dropdown settings me-2">
+            <a href="#" id="dropdownMenuLink" data-bs-toggle="dropdown">
+              <i class="fas fa-gear fa-lg ms-2"></i>
+            </a>
+
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li>
+                <a class="dropdown-item" href="#">Something else here</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="auth-body shadow-lg bg-body">
+        {% if error%}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+          <strong>{{error}}</strong>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {%endif%}
+        <nav>
+          <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <button
+              class="nav-link active"
+              id="nav-create-room-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#nav-create-room"
+              type="button"
+              role="tab"
+              aria-controls="nav-create-room"
+              aria-selected="true"
+            >
+              Create Room
+            </button>
+            <button
+              class="nav-link"
+              id="nav-join-room-tab"
+              data-bs-toggle="tab"
+              data-bs-target="#nav-join-room"
+              type="button"
+              role="tab"
+              aria-controls="nav-join-room"
+              aria-selected="false"
+            >
+              Join Room
+            </button>
+            <div id="drag-button" class="ms-3 mt-2">
+              <i class="fas fa-grip fa-sm"></i>
+            </div>
+          </div>
+        </nav>
+        <div class="tab-content" id="nav-tabContent">
+          <div
+            class="tab-pane fade show active"
+            id="nav-create-room"
+            role="tabpanel"
+            aria-labelledby="nav-create-room-tab"
+          >
+            <form method="post" class="pt-3 ms-1 mb-1 me-1">
+              <div class="mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="username"
+                  name="username"
+                  placeholder="Username"
+                  value="{{username}}"
+                />
+              </div>
+              <div class="input-group mb-3">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="code_room"
+                  name="code_room"
+                  placeholder="Code Room (6 Digits)"
+                  value="{{code_room}}"
+                />
+                <button class="btn btn-outline-secondary" type="button" id="button-generate-token" onclick="generate_room(100000,999999)"><i class="fas fa-refresh"></i></button>
+              </div>
+              <button
+                id="create_room"
+                name="create_room"
+                type="submit"
+                class="btn btn-secondary mb-2"
+              >
+                Create Room
+              </button>
+            </form>
+          </div>
+
+          <div
+            class="tab-pane fade"
+            id="nav-join-room"
+            role="tabpanel"
+            aria-labelledby="nav-join-room-tab"
+          >
+            <form method="post" class="pt-3 ms-1 mb-1 me-1">
+              <div class="mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="username"
+                  name="username"
+                  placeholder="Username"
+                  value="{{username}}"
+                />
+              </div>
+
+              <div class="mb-3">
+                <input
+                  type="text"
+                  class="form-control"
+                  id="code_room"
+                  name="code_room"
+                  placeholder="Code Room"
+                  value="{{code_room}}"
+                />
+              </div>
+              <button
+                id="join_room"
+                name="join_room"
+                type="submit"
+                class="btn btn-secondary mb-2"
+              >
+                Join Room
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="auth-footer d-flex justify-content-between">
+        <div class="mt-1">
+          <h6 class="ms-2"><a href="https://www.github.com/ivanpakpahan2702"><i class="fab fa-github fa-lg"></a></i></h6>
+        </div>
+      </div>
+    </div>
+{% include "separate/footer.html" %}

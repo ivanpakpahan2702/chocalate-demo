@@ -1,0 +1,123 @@
+{% include "separate/header.html" %}
+<section class="chatbox">
+  <header class="chatbox-header">
+    <div class="chatbox-header-title">
+      <i class="fas fa-comment-alt"></i>
+      <strong>Cochalate v.1.1</strong>
+    </div>
+    <div class="chatbox-header-options">
+      <div class="dropdown">
+        <a href="#" id="dropdownMenuLink" data-bs-toggle="dropdown">
+          <i class="fas fa-gear fa-lg ms-2" style="color: gray"></i>
+        </a>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+          <li class="dropdown-item">room : {{code_room}}</li>
+          <li class="dropdown-item">username : {{session['username']}}</li>
+          <li class="dropdown-item">
+            online user : <span id="online_users"></span>
+          </li>
+          <li>
+            <a class="dropdown-item" href="/logout"
+              ><i class="fas fa-right-from-bracket"></i>&nbsp;Log Out</a
+            >
+          </li>
+        </ul>
+      </div>
+    </div>
+  </header>
+
+  <main class="chatbox-chat" id="chatbox-chat">
+    {#
+    <div class="msg left-msg">
+      <div class="msg-img"></div>
+      <div class="msg-bubble">
+        <div class="msg-info">
+          <div class="msg-info-name">Hidden Com</div>
+          <div class="msg-info-time">00:00</div>
+        </div>
+        <div class="msg-text">Cochalate</div>
+      </div>
+    </div>
+    #} {%if messages%} {%for msg in messages%}
+    <div
+      class="msg {{'left-msg' if msg['username'] != session['username'] else 'right-msg'}}"
+    >
+      <div class="msg-bubble">
+        <div class="msg-info">
+          <div class="msg-info-name">{{msg['username']}}</div>
+          <div class="msg-info-time">{{msg['time']}}</div>
+        </div>
+        <div class="msg-text">{{msg['msg']}}</div>
+      </div>
+    </div>
+    {%endfor%} {%endif%}
+  </main>
+
+  <form class="chatbox-inputarea">
+    <input
+      type="text"
+      class="chatbox-input"
+      placeholder="Enter your message..."
+      id="message"
+    />
+    <button type="button" class="chatbox-send-btn" onclick="SendMessage()">
+      Send
+    </button>
+  </form>
+</section>
+{% include "separate/footer.html" %}
+<script type="text/javascript" charset="utf-8">
+  var socket = io();
+
+  socket.on("message", function (data) {
+    if (data.username == '{{session["username"]}}') {
+      content =
+        '<div class="msg right-msg"> <div class="msg-bubble"><div class="msg-info"><div class="msg-info-name">' +
+        data.username +
+        '</div><div class="msg-info-time">' +
+        data.time +
+        '</div></div><div class="msg-text">' +
+        data.msg +
+        "</div></div></div>";
+    } else if (data.username != '{{session["username"]}}') {
+      content =
+        '<div class="msg left-msg"> <div class="msg-bubble"><div class="msg-info"><div class="msg-info-name">' +
+        data.username +
+        '</div><div class="msg-info-time">' +
+        data.time +
+        '</div></div><div class="msg-text">' +
+        data.msg +
+        "</div></div></div>";
+    }
+
+    if (data.msg !== null) {
+      $("#chatbox-chat").append(content);
+    }
+    $("#online_users").text(data.members);
+  });
+
+  function SendMessage() {
+    var currentdate = new Date();
+    var datetime =
+      currentdate.getDate() +
+      "/" +
+      (currentdate.getMonth() + 1) +
+      "/" +
+      currentdate.getFullYear() +
+      "-" +
+      currentdate.getHours() +
+      ":" +
+      currentdate.getMinutes() +
+      ":" +
+      currentdate.getSeconds();
+    if ($("#message").val() != "") {
+      socket.send({
+        username: '{{session["username"]}}',
+        msg: $("#message").val(),
+        time: datetime,
+        members: $("#online_users").text(),
+      });
+      $("#message").val("");
+    }
+  }
+</script>
