@@ -14,7 +14,7 @@
           <li class="dropdown-item">room : {{code_room}}</li>
           <li class="dropdown-item">username : {{session['username']}}</li>
           <li class="dropdown-item">
-            online user : <span id="online_users"></span>
+            online user : <span id="users_username"></span>
           </li>
           <li>
             <a class="dropdown-item" href="/logout"
@@ -69,6 +69,32 @@
 <script type="text/javascript" charset="utf-8">
   var socket = io();
 
+  //==========================================================================================
+  //===================== HANDLING CONNECT AND DISCONNECT MESSAGE ==========================================
+  //==========================================================================================
+  //==================================START===================================================
+  socket.on("disconnect", function (data) {
+    socket.send({
+      username: '{{session["username"]}}',
+      msg: "Disconnected",
+      time: datetime,
+      users_username: $("#users_username").text(),
+    });
+  });
+
+  socket.on("connect", function () {
+    console.log(socket.disconnected); // false
+  });
+
+  //==================================END=====================================================
+  //==========================================================================================
+  //===================== HANDLING DISCONNECT MESSAGE ==========================================
+  //==========================================================================================
+
+  //==========================================================================================
+  //===================== HANDLING RECEIVED MESSAGE ==========================================
+  //==========================================================================================
+  //==================================START===================================================
   socket.on("message", function (data) {
     if (data.username == '{{session["username"]}}') {
       content =
@@ -90,12 +116,36 @@
         "</div></div></div>";
     }
 
-    if (data.msg !== null) {
+    if (data.msg !== "") {
       $("#chatbox-chat").append(content);
     }
-    $("#online_users").text(data.members);
-  });
+    console.log(data.users_username);
 
+    if (typeof data.users_username == Array) {
+      let txt = "";
+      data.users_username.forEach(accessing_array);
+
+      let string_length = txt.length;
+      let result = txt.substr(0, string_length - 1);
+
+      $("#users_username").text(result);
+
+      function accessing_array(value) {
+        txt += value + ",";
+      }
+    } else {
+      $("#users_username").text(data.users_username);
+    }
+  });
+  //==================================END=====================================================
+  //==========================================================================================
+  //===================== HANDLING RECEIVED MESSAGE ==========================================
+  //==========================================================================================
+
+  //==========================================================================================
+  //===================== FUNCTION TO SEND MESSAGE ===========================================
+  //==========================================================================================
+  //================================START=====================================================
   function SendMessage() {
     var currentdate = new Date();
     var datetime =
@@ -115,9 +165,13 @@
         username: '{{session["username"]}}',
         msg: $("#message").val(),
         time: datetime,
-        members: $("#online_users").text(),
+        users_username: $("#users_username").text(),
       });
       $("#message").val("");
     }
   }
+  //================================END=======================================================
+  //==========================================================================================
+  //===================== FUNCTION TO SEND MESSAGE ===========================================
+  //==========================================================================================
 </script>

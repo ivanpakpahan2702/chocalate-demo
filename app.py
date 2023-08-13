@@ -15,7 +15,7 @@ current_time = now.strftime("%D-%H:%M:%S")
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
-socket_io = SocketIO(app, cors_allowed_origins="*",ping_interval=1,ping_timeout=10)
+socket_io = SocketIO(app, cors_allowed_origins="*")
 
 rooms = {}
 
@@ -26,7 +26,7 @@ def make_session_permanent():
 
 @app.route('/',methods=['GET','POST'])
 def auth():
-
+    global rooms
     if request.method == "POST":
         username    = request.form.get("username")
         code_room   = str(request.form.get("code_room"))
@@ -44,7 +44,7 @@ def auth():
                 return render_template("auth.html", error="Code room already exists.", code_room=code_room, username=username)
             else:
                 room = code_room
-                rooms[room] = {"members": 0,"users_username":[], "content": []}
+                rooms[room] = {"members": 0,"users_username":[username], "content": []}
                 session["room"] = code_room
                 session["username"] = username
                 return redirect(url_for("room"))
@@ -61,6 +61,8 @@ def auth():
             else:
                 session["room"] = code_room
                 session["username"] = username
+                if username not in rooms[code_room]['users_username']:
+                    rooms[code_room]['users_username'].append(username)
                 return redirect(url_for("room"))
     
     return render_template('auth.html')
@@ -68,20 +70,33 @@ def auth():
 
 @app.route('/room',methods=['GET','POST'])
 def room():
+    global rooms
     room = session.get("room")
     if (room is None) or (session.get("username") is None) or (room not in rooms):
         return redirect(url_for("auth"))
     
-    return render_template('room.html',code_room=room, messages=rooms[room]["content"],members=rooms[room]['members'])
+    return render_template('room.html',code_room=room, messages=rooms[room]["content"],users_username=rooms[room]['users_username'])
 
 
 @app.route('/logout',methods=['GET','POST'])
 def logout():
+    global rooms
+    room = session.get("room")
+    username = session.get("username")
+    rooms[room]['users_username'].remove(username)
+    if room in rooms:
+        rooms[room]["members"] -= 1
+        message_file = {'username': username, 'msg': None, 'time': current_time, 'users_username':rooms[room]['users_username']}
+        socket_io.send(message_file, to=room);
+        rooms[room]['content'].append(message_file)
+        if rooms[room]["members"] <= 0:
+            del rooms[room]
     session.clear()
     return redirect(url_for('auth'))
 
 @socket_io.on('message')
 def handle_message(message_file):
+    global rooms
     room = session.get("room")
     if room not in rooms:
         return
@@ -93,29 +108,30 @@ def handle_message(message_file):
 
 @socket_io.on('connect')
 def connect(auth):
+    global rooms
     room = session.get("room")
     username = session.get("username")
     join_room(room)
     rooms[room]['members'] += 1
-    message_file = {'username': username, 'msg': " Connected!", 'time': current_time, 'members':rooms[room]['members']}
+    message_file = {'username': username, 'msg': " Connected!", 'time': current_time, 'users_username':rooms[room]['users_username']}
     socket_io.send(message_file, to=room);
     rooms[room]['content'].append(message_file)
-    rooms[room]['users_username'].append(username)
+    if username not in rooms[room]['users_username']:
+        rooms[room]['users_username'].append(username)
 
 
 
 @socket_io.on('disconnect')
 def disconnect():
+    global rooms
     room = session.get("room")
     username = session.get("username")
     rooms[room]['users_username'].remove(username)
-
-
-    leave_room(room)
     if room in rooms:
         rooms[room]["members"] -= 1
-        message_file = {'username': username, 'msg': None, 'time': current_time, 'members':rooms[room]['members']}
+        message_file = {'username': username, 'msg': '', 'time': current_time, 'users_username':rooms[room]['users_username']}
         socket_io.send(message_file, to=room);
+        leave_room(room)
         rooms[room]['content'].append(message_file)
         if rooms[room]["members"] <= 0:
             del rooms[room]
