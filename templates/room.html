@@ -3,7 +3,13 @@
   <header class="chatbox-header">
     <div class="chatbox-header-title">
       <i class="fas fa-comment-alt"></i>
-      <strong>Cochalate v.1.1</strong>
+      <strong>Cochalate v.1.1</strong><br />
+      <div class="typing-indicator">
+        <span></span>
+        <span></span>
+        <span></span>
+        <small>&nbsp;Someone is typing.</small>
+      </div>
     </div>
     <div class="chatbox-header-options">
       <div class="dropdown">
@@ -27,20 +33,9 @@
   </header>
 
   <main class="chatbox-chat" id="chatbox-chat">
-    {#
-    <div class="msg left-msg">
-      <div class="msg-img"></div>
-      <div class="msg-bubble">
-        <div class="msg-info">
-          <div class="msg-info-name">Hidden Com</div>
-          <div class="msg-info-time">00:00</div>
-        </div>
-        <div class="msg-text">Cochalate</div>
-      </div>
-    </div>
-    #} {%if messages%} {%for msg in messages%}
+    {%if messages%} {%for msg in messages%}
     <div
-      class="msg {{'left-msg' if msg['username'] != session['username'] else 'right-msg'}}"
+      class="msg {{'left-msg' if (msg['username'] != session['username']) else 'right-msg'}} {{'server' if msg['username']=='Chocalate Server'}}"
     >
       <div class="msg-bubble">
         <div class="msg-info">
@@ -51,9 +46,10 @@
       </div>
     </div>
     {%endfor%} {%endif%}
+    <div id="bottom"></div>
   </main>
 
-  <form class="chatbox-inputarea">
+  <div class="chatbox-inputarea">
     <input
       type="text"
       class="chatbox-input"
@@ -63,32 +59,40 @@
     <button type="button" class="chatbox-send-btn" onclick="SendMessage()">
       Send
     </button>
-  </form>
+  </div>
 </section>
 {% include "separate/footer.html" %}
 <script type="text/javascript" charset="utf-8">
   var socket = io();
 
   //==========================================================================================
-  //===================== HANDLING CONNECT AND DISCONNECT MESSAGE ==========================================
+  //===================== HANDLING DISCONNECT MESSAGE ========================================
   //==========================================================================================
   //==================================START===================================================
-  socket.on("disconnect", function (data) {
-    socket.send({
-      username: '{{session["username"]}}',
-      msg: "Disconnected",
+  window.onbeforeunload = function () {
+    var currentdate = new Date();
+    var datetime =
+      currentdate.getDate() +
+      "/" +
+      (currentdate.getMonth() + 1) +
+      "/" +
+      currentdate.getFullYear() +
+      "-" +
+      currentdate.getHours() +
+      ":" +
+      currentdate.getMinutes() +
+      ":" +
+      currentdate.getSeconds();
+    socket.emit("client_disconnecting", {
+      username: "Chocalate Server",
+      msg: "{{session['username']}}" + " had left the room",
       time: datetime,
       users_username: $("#users_username").text(),
     });
-  });
-
-  socket.on("connect", function () {
-    console.log(socket.disconnected); // false
-  });
-
+  };
   //==================================END=====================================================
   //==========================================================================================
-  //===================== HANDLING DISCONNECT MESSAGE ==========================================
+  //===================== HANDLING DISCONNECT MESSAGE ========================================
   //==========================================================================================
 
   //==========================================================================================
@@ -106,20 +110,30 @@
         data.msg +
         "</div></div></div>";
     } else if (data.username != '{{session["username"]}}') {
-      content =
-        '<div class="msg left-msg"> <div class="msg-bubble"><div class="msg-info"><div class="msg-info-name">' +
-        data.username +
-        '</div><div class="msg-info-time">' +
-        data.time +
-        '</div></div><div class="msg-text">' +
-        data.msg +
-        "</div></div></div>";
+      if (data.username === "Chocalate Server") {
+        content =
+          '<div class="msg left-msg server"> <div class="msg-bubble"><div class="msg-info"><div class="msg-info-name">' +
+          data.username +
+          '</div><div class="msg-info-time">' +
+          data.time +
+          '</div></div><div class="msg-text">' +
+          data.msg +
+          "</div></div></div>";
+      } else {
+        content =
+          '<div class="msg left-msg"> <div class="msg-bubble"><div class="msg-info"><div class="msg-info-name">' +
+          data.username +
+          '</div><div class="msg-info-time">' +
+          data.time +
+          '</div></div><div class="msg-text">' +
+          data.msg +
+          "</div></div></div>";
+      }
     }
 
     if (data.msg !== "") {
       $("#chatbox-chat").append(content);
     }
-    console.log(data.users_username);
 
     if (typeof data.users_username == Array) {
       let txt = "";
@@ -135,6 +149,17 @@
       }
     } else {
       $("#users_username").text(data.users_username);
+    }
+    $(".msg").last()[0].scrollIntoView();
+
+    if (data.status == "now typing") {
+      $(".typing-indicator").css("display", "flex");
+      console.log(data.status);
+    } else if (data.status == "done typing") {
+      $(".typing-indicator").css("display", "none");
+      console.log(data.status);
+    } else {
+      console.log("Tidak Ada");
     }
   });
   //==================================END=====================================================
@@ -173,5 +198,53 @@
   //================================END=======================================================
   //==========================================================================================
   //===================== FUNCTION TO SEND MESSAGE ===========================================
+  //==========================================================================================
+
+  //==========================================================================================
+  //===================== TYPING INDICATOR====================================================
+  //==========================================================================================
+  //================================START=======================================================
+
+  $(document).ready(function () {
+    var tmo = null;
+    $("#message").on("input", function () {
+      var currentdate = new Date();
+      var datetime =
+        currentdate.getDate() +
+        "/" +
+        (currentdate.getMonth() + 1) +
+        "/" +
+        currentdate.getFullYear() +
+        "-" +
+        currentdate.getHours() +
+        ":" +
+        currentdate.getMinutes() +
+        ":" +
+        currentdate.getSeconds();
+      console.log("lagi ngetik");
+      socket.emit("client_now_typing", {
+        username: "{{session['username']}}",
+        msg: "yes",
+        time: datetime,
+        users_username: $("#users_username").text(),
+      });
+
+      if (tmo) {
+        clearTimeout(tmo);
+      }
+      tmo = setTimeout(function () {
+        socket.emit("client_done_typing", {
+          username: "{{session['username']}}",
+          msg: "no",
+          time: datetime,
+          users_username: $("#users_username").text(),
+        });
+      }, 1000);
+    });
+  });
+
+  //================================END=======================================================
+  //==========================================================================================
+  //===================== TYPING INDICATOR ===================================================
   //==========================================================================================
 </script>

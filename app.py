@@ -83,14 +83,10 @@ def logout():
     global rooms
     room = session.get("room")
     username = session.get("username")
-    rooms[room]['users_username'].remove(username)
-    if room in rooms:
-        rooms[room]["members"] -= 1
-        message_file = {'username': username, 'msg': None, 'time': current_time, 'users_username':rooms[room]['users_username']}
-        socket_io.send(message_file, to=room);
-        rooms[room]['content'].append(message_file)
-        if rooms[room]["members"] <= 0:
-            del rooms[room]
+    try:
+        rooms[room]['users_username'].remove(username)  
+    except:
+        print('cannot delete username!')
     session.clear()
     return redirect(url_for('auth'))
 
@@ -113,28 +109,50 @@ def connect(auth):
     username = session.get("username")
     join_room(room)
     rooms[room]['members'] += 1
-    message_file = {'username': username, 'msg': " Connected!", 'time': current_time, 'users_username':rooms[room]['users_username']}
+    if username not in rooms[room]['users_username']:
+        try:
+            rooms[room]['users_username'].append(username)
+        except:
+            print('cannot append username!')
+    message_file = {'username': "Chocalate Server", 'msg': username+" has joined the room", 'time': current_time, 'users_username':rooms[room]['users_username']}
     socket_io.send(message_file, to=room);
     rooms[room]['content'].append(message_file)
-    if username not in rooms[room]['users_username']:
-        rooms[room]['users_username'].append(username)
 
 
-
-@socket_io.on('disconnect')
-def disconnect():
+@socket_io.on('client_disconnecting')
+def disconnect(data):
     global rooms
     room = session.get("room")
     username = session.get("username")
-    rooms[room]['users_username'].remove(username)
+    try:
+        rooms[room]['users_username'].remove(username)  
+    except:
+        print('cannot delete username!')
     if room in rooms:
         rooms[room]["members"] -= 1
-        message_file = {'username': username, 'msg': '', 'time': current_time, 'users_username':rooms[room]['users_username']}
+        message_file = {'username': 'Chocalate Server', 'msg': username+' has left the room', 'time': current_time, 'users_username':rooms[room]['users_username']}
         socket_io.send(message_file, to=room);
         leave_room(room)
         rooms[room]['content'].append(message_file)
         if rooms[room]["members"] <= 0:
             del rooms[room]
+            return redirect(url_for('auth'))
+
+
+@socket_io.on('client_now_typing')
+def now_typing(data):
+    message_file = {'username': data['username'], 'msg': data['msg'], 'time': current_time, 'users_username':rooms[room]['users_username'], 'status':'now typing'}
+    print("==================================================TYPING==============================================")
+    print(data)
+    socket_io.send(message_file, to=room);
+
+
+@socket_io.on('client_done_typing')
+def done_typing(data):
+    print("=====================================DONE TYPING===========================================================")
+    print(data)
+    message_file = {'username': data['username'], 'msg': data['msg'], 'time': current_time, 'users_username':rooms[room]['users_username'], 'status':'done typing'}
+    socket_io.send(message_file, to=room);
 
 
 @socket_io.on_error() 
