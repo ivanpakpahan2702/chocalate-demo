@@ -27,44 +27,55 @@ def make_session_permanent():
 @app.route('/',methods=['GET','POST'])
 def auth():
     global rooms
-    if request.method == "POST":
-        username    = request.form.get("username")
-        code_room   = str(request.form.get("code_room"))
-        create      = request.form.get("create_room", False)
-        join        = request.form.get("join_room", False)
-    
-        if create != False:
-            if not username:
-                return render_template("auth.html", error="Please enter a username.", code_room=code_room, username=username)
-            elif not code_room:
-                return render_template("auth.html", error="Please enter a code room.", code_room=code_room, username=username)
-            elif len(code_room)<6:
-                return render_template("auth.html", error="Code room must be in 6 digits.", code_room=code_room, username=username)
-            elif (code_room) in rooms:
-                return render_template("auth.html", error="Code room already exists.", code_room=code_room, username=username)
-            else:
-                room = code_room
-                rooms[room] = {"members": 0,"users_username":[username], "content": []}
-                session["room"] = code_room
-                session["username"] = username
+    if session.get('room') != None:
+        room = session.get("room")
+        try:
+            if rooms[room]>0:
                 return redirect(url_for("room"))
+        except:
+            session.clear()
+            return render_template('auth.html')
+    else:
+        if request.method == "POST":
+            username    = request.form.get("username")
+            code_room   = str(request.form.get("code_room"))
+            create      = request.form.get("create_room", False)
+            join        = request.form.get("join_room", False)
         
-        elif join != False:
-            if not username:
-                return render_template("auth.html", error="Please enter a username.", code_room=code_room, username=username)
-            elif not code_room:
-                return render_template("auth.html", error="Please enter a code room.", code_room=code_room, username=username)        
-            elif code_room not in rooms:
-                return render_template("auth.html", error="Room does not exist.", code_room=code_room, username=username)
-            elif username in rooms[code_room]['users_username']:
-                return render_template("auth.html", error="Username already exist.", code_room=code_room, username=username)
-            else:
-                session["room"] = code_room
-                session["username"] = username
-                if username not in rooms[code_room]['users_username']:
-                    rooms[code_room]['users_username'].append(username)
-                return redirect(url_for("room"))
-    
+            if create != False:
+                if not username:
+                    return render_template("auth.html", error="Please enter a username.", code_room=code_room, username=username)
+                elif len(username)>50:
+                    return render_template("auth.html", error="Max username's character is 50.", code_room=code_room, username=username)
+                elif not code_room:
+                    return render_template("auth.html", error="Please enter a code room.", code_room=code_room, username=username)
+                elif len(code_room)<6:
+                    return render_template("auth.html", error="Code room must be in 6 digits.", code_room=code_room, username=username)
+                elif (code_room) in rooms:
+                    return render_template("auth.html", error="Code room already exists.", code_room=code_room, username=username)
+                else:
+                    room = code_room
+                    rooms[room] = {"members": 0,"users_username":[username], "content": []}
+                    session["room"] = code_room
+                    session["username"] = username
+                    return redirect(url_for("room"))
+            
+            elif join != False:
+                if not username:
+                    return render_template("auth.html", error="Please enter a username.", code_room=code_room, username=username)
+                elif not code_room:
+                    return render_template("auth.html", error="Please enter a code room.", code_room=code_room, username=username)        
+                elif code_room not in rooms:
+                    return render_template("auth.html", error="Room does not exist.", code_room=code_room, username=username)
+                elif username in rooms[code_room]['users_username']:
+                    return render_template("auth.html", error="Username already exist.", code_room=code_room, username=username)
+                else:
+                    session["room"] = code_room
+                    session["username"] = username
+                    if username not in rooms[code_room]['users_username']:
+                        rooms[code_room]['users_username'].append(username)
+                    return redirect(url_for("room"))
+        
     return render_template('auth.html')
 
 
