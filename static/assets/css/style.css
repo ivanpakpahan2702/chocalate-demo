@@ -18,6 +18,7 @@ a {
   z-index: 1;
   border: 2px solid;
   border-color: rgba(228, 216, 216, 0.288);
+  overflow: auto;
 }
 .auth::before {
   content: "";
@@ -57,11 +58,17 @@ a {
 .auth-body,
 .nav-tabs,
 .tab-content {
-  width: 275px;
+  width: 300px;
   margin: auto;
+}
+.auth-body {
+  /* overflow: auto; */
 }
 .nav-link {
   color: gray;
+}
+.nav-link .active {
+  background-color: #579ffb;
 }
 #drag-button:hover {
   cursor: all-scroll;
@@ -80,7 +87,7 @@ a {
 /* Chat Room */
 /* =============== */
 .dropdown-menu {
-  width: 150px;
+  width: 175px;
   overflow: auto;
 }
 :root {
@@ -218,7 +225,7 @@ a {
   background-color: #e6e7ed;
   will-change: transform;
   border-radius: 2px 13px 13px 13px;
-  display: flex;
+  display: block;
   flex-flow: row nowrap;
   margin: 0 auto;
   position: relative;
@@ -226,11 +233,13 @@ a {
   animation: 2s bulge infinite ease-out;
   justify-content: center;
   align-items: center;
+  height: 40px;
+  overflow-y: auto;
 }
 
 .indicator {
-  width: 250px;
-  overflow: auto;
+  width: 280px;
+  overflow-x: auto;
 }
 
 .typing-indicator span {

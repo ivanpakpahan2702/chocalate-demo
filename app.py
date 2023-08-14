@@ -29,6 +29,7 @@ def auth():
     global rooms
     if session.get('room') != None:
         room = session.get("room")
+        print('Room sudah ada kamu boleh masuk')
         try:
             if rooms[room]>0:
                 return redirect(url_for("room"))
@@ -109,6 +110,9 @@ def handle_message(message_file):
     room = session.get("room")
     if room not in rooms:
         return
+    if rooms[room]["members"] <= 0:
+        del rooms[room]
+        return redirect(url_for('auth'))
     try:
         print('=========================================')
         print(message_file)
