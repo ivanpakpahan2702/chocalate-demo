@@ -45,14 +45,14 @@
   </main>
 
   <div class="chatbox-inputarea">
-    <input
+    <textarea
       type="text"
       class="chatbox-input"
       placeholder="Enter your message..."
       id="message"
-    />
+    ></textarea>
     <button type="button" class="chatbox-send-btn" onclick="SendMessage()">
-      Send
+      <i class="fa-solid fa-paper-plane"></i>
     </button>
   </div>
 </section>
@@ -224,10 +224,10 @@
           typing = true;
           socket.emit("client_now_typing", {});
           console.log("typing...");
-          timeout = setTimeout(timeoutFunction, 5000);
+          timeout = setTimeout(timeoutFunction, 1000);
         } else {
           clearTimeout(timeout);
-          timeout = setTimeout(timeoutFunction, 5000);
+          timeout = setTimeout(timeoutFunction, 1000);
         }
       } else {
         typing = false;
@@ -240,5 +240,29 @@
   //================================END=======================================================
   //==========================================================================================
   //===================== TYPING INDICATOR ===================================================
+  //==========================================================================================
+
+  //==========================================================================================
+  //===================== TAB AT TEXT AREA ===================================================
+  //================================START=====================================================
+  //==========================================================================================
+
+  document.getElementById("message").addEventListener("keydown", function (e) {
+    if (e.key == "Tab") {
+      e.preventDefault();
+      var start = this.selectionStart;
+      var end = this.selectionEnd;
+
+      // set textarea value to: text before caret + tab + text after caret
+      this.value =
+        this.value.substring(0, start) + "\t" + this.value.substring(end);
+
+      // put caret at right position again
+      this.selectionStart = this.selectionEnd = start + 1;
+    }
+  });
+  //================================END=======================================================
+  //==========================================================================================
+  //===================== TAB AT TEXT AREA ===================================================
   //==========================================================================================
 </script>

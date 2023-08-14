@@ -92,11 +92,15 @@ def logout():
 
 @socket_io.on('message')
 def handle_message(message_file):
+    message_file['msg'] = message_file['msg'].replace('\n', '<br/>');
+    message_file['msg'] = message_file['msg'].replace('\t', '&nbsp;&nbsp;&nbsp;&nbsp;');
     global rooms
     room = session.get("room")
     if room not in rooms:
         return
     try:
+        print('=========================================')
+        print(message_file)
         send(message_file, to=room)
         rooms[room]['content'].append(message_file)
     except:
