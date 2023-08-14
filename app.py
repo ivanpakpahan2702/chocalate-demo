@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 from flask_socketio import SocketIO,emit,send,join_room,leave_room
 from datetime import datetime,timedelta
+import json
 
 '''
 import pytz
@@ -114,10 +115,9 @@ def handle_message(message_file):
         del rooms[room]
         return redirect(url_for('auth'))
     try:
-        print('=========================================')
-        print(message_file)
         send(message_file, to=room)
-        rooms[room]['content'].append(message_file)
+        if (message_file['msg'] != '') or message_file['msg'] != None:
+            rooms[room]['content'].append(message_file)
     except:
         return
 
@@ -154,6 +154,14 @@ def disconnect(data):
         leave_room(room)
         rooms[room]['content'].append(message_file)
         if rooms[room]["members"] <= 0:
+            pth_current_time =  (str(current_time)).replace(':','_')
+            pth_current_time =  pth_current_time.replace('/','_')
+            message_file_name = "message_history/"+pth_current_time+'_message_.txt'
+            try:
+                with open(message_file_name, 'w') as convert_file:
+                    convert_file.write(json.dumps(rooms[room]))
+            except Exception as e:
+                print(e)
             del rooms[room]
             return redirect(url_for('auth'))
 
@@ -162,8 +170,6 @@ def disconnect(data):
 def now_typing(data):
     username = session.get('username')
     room = session.get("room")
-    print("==================================================TYPING==============================================")
-    print(data)
     try:
         message_file = {'username': username, 'msg': '', 'time': current_time, 'users_username':rooms[room]['users_username'], 'status':'now typing'}
         socket_io.send(message_file, to=room)
@@ -175,8 +181,6 @@ def now_typing(data):
 def done_typing(data):
     username = session.get('username')
     room = session.get("room")
-    print("=====================================DONE TYPING===========================================================")
-    print(data)
     message_file = {'username': username, 'msg': '', 'time': current_time, 'users_username':rooms[room]['users_username'], 'status':'done typing'}
     socket_io.send(message_file, to=room)
 
@@ -188,4 +192,4 @@ def error_handler(e):
 
 
 if __name__ == '__main__':
-    socket_io.run(app, debug=True)
+    socket_io.run(app,host = '192.168.1.6',port=5000, debug=True)

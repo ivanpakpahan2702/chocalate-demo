@@ -58,7 +58,7 @@
 </section>
 {% include "separate/footer.html" %}
 <script type="text/javascript" charset="utf-8">
-  var socket = io();
+  var socket = io("192.168.1.6:5000");
 
   //==========================================================================================
   //===================== HANDLING DISCONNECT MESSAGE ========================================
@@ -150,7 +150,7 @@
     indicator =
       '<div class="indicator" id="' +
       data.username +
-      '"><span></span><span></span><span></span><small>&nbsp;' +
+      '"><small>&nbsp;' +
       data.username +
       " is typing.</small></div>";
 

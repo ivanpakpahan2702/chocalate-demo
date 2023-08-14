@@ -70,7 +70,8 @@ a {
   border: none !important;
 }
 .active {
-  background-color: rgba(16, 199, 199, 0.637) !important;
+  background-color: rgba(21, 24, 24, 0.637) !important;
+  color: #eee !important;
 }
 #drag-button:hover {
   cursor: all-scroll;
@@ -224,7 +225,7 @@ a {
 }
 /* Typing Indicator */
 .typing-indicator {
-  background-color: #e6e7ed;
+  /* background-color: #e6e7ed; */
   will-change: transform;
   border-radius: 2px 13px 13px 13px;
   display: block;
@@ -236,11 +237,11 @@ a {
   justify-content: center;
   align-items: center;
   height: 40px;
-  overflow-y: auto;
+  overflow: auto;
 }
 
 .indicator {
-  width: 280px;
+  width: 150px;
   overflow-x: auto;
 }
 
@@ -312,6 +313,24 @@ a {
 @media (max-width: 575.98px) {
   body {
     font-size: 80%;
+  }
+  .btn {
+    font-size: 90%;
+  }
+  .dropdown-menu {
+    font-size: 90%;
+  }
+  .indicator {
+    font-size: 90%;
+  }
+  .chatbox {
+    min-width: 300px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: 5px auto;
   }
   ::-webkit-input-placeholder {
     /* Edge */
