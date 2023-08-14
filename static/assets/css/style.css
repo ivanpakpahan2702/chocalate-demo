@@ -12,7 +12,7 @@ a {
 /* =============== */
 .auth {
   background-color: white;
-  height: 500px;
+  /* height: 500px; */
   border-radius: 10px;
   position: relative;
   z-index: 1;
@@ -55,20 +55,22 @@ a {
   -ms-user-select: none;
   border: lightgrey solid 1px;
 }
-.auth-body,
 .nav-tabs,
 .tab-content {
-  width: 300px;
+  width: auto;
   margin: auto;
 }
 .auth-body {
-  /* overflow: auto; */
+  max-width: 300px;
+  overflow: auto;
+  margin: 75px auto;
 }
 .nav-link {
   color: gray;
+  border: none !important;
 }
-.nav-link .active {
-  background-color: #579ffb;
+.active {
+  background-color: rgba(16, 199, 199, 0.637) !important;
 }
 #drag-button:hover {
   cursor: all-scroll;
@@ -285,6 +287,8 @@ a {
     transform: scale(1.05);
   }
 }
+
+/* Scroolbar */
 ::-webkit-scrollbar {
   width: 20px;
 }
@@ -302,4 +306,24 @@ a {
 
 ::-webkit-scrollbar-thumb:hover {
   background-color: #777;
+}
+
+/* Extra small devices (portrait phones, less than 576px) */
+@media (max-width: 575.98px) {
+  body {
+    font-size: 80%;
+  }
+  ::-webkit-input-placeholder {
+    /* Edge */
+    font-size: 80%;
+  }
+
+  :-ms-input-placeholder {
+    /* Internet Explorer 10-11 */
+    font-size: 80%;
+  }
+
+  ::placeholder {
+    font-size: 80%;
+  }
 }
