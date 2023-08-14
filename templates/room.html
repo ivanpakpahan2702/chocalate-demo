@@ -4,12 +4,7 @@
     <div class="chatbox-header-title">
       <i class="fas fa-comment-alt"></i>
       <strong>Cochalate v.1.1</strong><br />
-      <div class="typing-indicator">
-        <span></span>
-        <span></span>
-        <span></span>
-        <small>&nbsp;Someone is typing.</small>
-      </div>
+      <div class="typing-indicator"></div>
     </div>
     <div class="chatbox-header-options">
       <div class="dropdown">
@@ -152,14 +147,17 @@
     }
     $(".msg").last()[0].scrollIntoView();
 
+    indicator =
+      '<div class="indicator" id="' +
+      data.username +
+      '"><span></span><span></span><span></span><small>&nbsp;' +
+      data.username +
+      " is typing.</small></div>";
+
     if (data.status == "now typing") {
-      $(".typing-indicator").css("display", "flex");
-      console.log(data.status);
+      $(".typing-indicator").append(indicator);
     } else if (data.status == "done typing") {
-      $(".typing-indicator").css("display", "none");
-      console.log(data.status);
-    } else {
-      console.log("Tidak Ada");
+      $("#" + data.username).remove();
     }
   });
   //==================================END=====================================================
@@ -204,42 +202,38 @@
   //===================== TYPING INDICATOR====================================================
   //==========================================================================================
   //================================START=======================================================
+  $(function () {
+    var theText = $("#message");
+    var typing = false;
+    var timeout = undefined;
+    var elementClicked = false;
 
-  $(document).ready(function () {
-    var tmo = null;
-    $("#message").on("input", function () {
-      var currentdate = new Date();
-      var datetime =
-        currentdate.getDate() +
-        "/" +
-        (currentdate.getMonth() + 1) +
-        "/" +
-        currentdate.getFullYear() +
-        "-" +
-        currentdate.getHours() +
-        ":" +
-        currentdate.getMinutes() +
-        ":" +
-        currentdate.getSeconds();
-      console.log("lagi ngetik");
-      socket.emit("client_now_typing", {
-        username: "{{session['username']}}",
-        msg: "yes",
-        time: datetime,
-        users_username: $("#users_username").text(),
+    function timeoutFunction() {
+      typing = false;
+      socket.emit("client_done_typing", {});
+      console.log("done...");
+    }
+
+    theText.keydown(function (event) {
+      $("#button").click(function () {
+        elementClicked = true;
       });
 
-      if (tmo) {
-        clearTimeout(tmo);
+      if (elementClicked != true) {
+        if (typing == false) {
+          typing = true;
+          socket.emit("client_now_typing", {});
+          console.log("typing...");
+          timeout = setTimeout(timeoutFunction, 5000);
+        } else {
+          clearTimeout(timeout);
+          timeout = setTimeout(timeoutFunction, 5000);
+        }
+      } else {
+        typing = false;
+        socket.emit("client_done_typing", {});
+        console.log("done...");
       }
-      tmo = setTimeout(function () {
-        socket.emit("client_done_typing", {
-          username: "{{session['username']}}",
-          msg: "no",
-          time: datetime,
-          users_username: $("#users_username").text(),
-        });
-      }, 1000);
     });
   });
 

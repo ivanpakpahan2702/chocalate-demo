@@ -141,18 +141,25 @@ def disconnect(data):
 
 @socket_io.on('client_now_typing')
 def now_typing(data):
-    message_file = {'username': data['username'], 'msg': data['msg'], 'time': current_time, 'users_username':rooms[room]['users_username'], 'status':'now typing'}
+    username = session.get('username')
+    room = session.get("room")
     print("==================================================TYPING==============================================")
     print(data)
-    socket_io.send(message_file, to=room);
+    try:
+        message_file = {'username': username, 'msg': '', 'time': current_time, 'users_username':rooms[room]['users_username'], 'status':'now typing'}
+        socket_io.send(message_file, to=room)
+    except:
+        print('Error!')
 
 
 @socket_io.on('client_done_typing')
 def done_typing(data):
+    username = session.get('username')
+    room = session.get("room")
     print("=====================================DONE TYPING===========================================================")
     print(data)
-    message_file = {'username': data['username'], 'msg': data['msg'], 'time': current_time, 'users_username':rooms[room]['users_username'], 'status':'done typing'}
-    socket_io.send(message_file, to=room);
+    message_file = {'username': username, 'msg': '', 'time': current_time, 'users_username':rooms[room]['users_username'], 'status':'done typing'}
+    socket_io.send(message_file, to=room)
 
 
 @socket_io.on_error() 
