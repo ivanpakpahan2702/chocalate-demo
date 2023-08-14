@@ -330,7 +330,8 @@ a {
     right: 0;
     top: 0;
     bottom: 0;
-    margin: 5px auto;
+    margin: 0px auto;
+    height: auto;
   }
   ::-webkit-input-placeholder {
     /* Edge */
