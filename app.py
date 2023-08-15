@@ -51,7 +51,7 @@ def auth():
                     return render_template("auth.html", error="Max username's character is 50.", code_room=code_room, username=username)
                 elif not code_room:
                     return render_template("auth.html", error="Please enter a code room.", code_room=code_room, username=username)
-                elif len(code_room)<6:
+                elif len(code_room)<6 or len(code_room)>6:
                     return render_template("auth.html", error="Code room must be in 6 digits.", code_room=code_room, username=username)
                 elif (code_room) in rooms:
                     return render_template("auth.html", error="Code room already exists.", code_room=code_room, username=username)
@@ -105,9 +105,10 @@ def logout():
 
 @socket_io.on('message')
 def handle_message(message_file):
-    message_file['msg'] = message_file['msg'].replace('\n', '<br/>');
-    message_file['msg'] = message_file['msg'].replace('\t', '&nbsp;&nbsp;&nbsp;&nbsp;');
     global rooms
+    message_file['msg'] = message_file['msg'].replace('\n', '<br/>')
+    message_file['msg'] = message_file['msg'].replace('\t', '&nbsp;&nbsp;&nbsp;&nbsp;')
+    # message_file['users_username'] = rooms[room]['users_username']
     room = session.get("room")
     if room not in rooms:
         return
@@ -192,4 +193,4 @@ def error_handler(e):
 
 
 if __name__ == '__main__':
-    socket_io.run(app,host = '192.168.1.6',port=5000, debug=True)
+    socket_io.run(app,port=5000, debug=True)

@@ -1,7 +1,9 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap");
 body {
   margin: 50px;
   background: url("/static/assets/Images/cartoon-background-with-stars_1110-892.avif");
   background-repeat: repeat;
+  font-family: "Poppins", sans-serif;
 }
 a {
   text-decoration: none;
@@ -61,17 +63,20 @@ a {
   margin: auto;
 }
 .auth-body {
-  max-width: 300px;
+  width: 300px;
   overflow: auto;
   margin: 75px auto;
 }
 .nav-link {
   color: gray;
-  border: none !important;
+}
+.nav-link:hover {
+  color: lightslategray !important;
 }
 .active {
-  background-color: rgba(21, 24, 24, 0.637) !important;
+  background-color: gray !important;
   color: #eee !important;
+  border: 1px solid gray !important;
 }
 #drag-button:hover {
   cursor: all-scroll;
@@ -90,7 +95,6 @@ a {
 /* Chat Room */
 /* =============== */
 .dropdown-menu {
-  width: 175px;
   overflow: auto;
 }
 :root {
@@ -121,6 +125,9 @@ a {
   border-bottom: var(--border);
   background: #eee;
   color: #666;
+  height: 50px;
+}
+.chatbox-header-title {
 }
 .chatbox-chat {
   flex: 1;
@@ -224,11 +231,26 @@ a {
   background: url("/static/assets/Images/output-onlinepngtools.png");
 }
 /* Typing Indicator */
+#typing-notif {
+  /* display: none; */
+}
+#typing-notif .icon-user {
+  display: flex;
+  float: left;
+  color: gray;
+  -webkit-animation: 2s bulge infinite ease-out;
+  animation: 2s bulge infinite ease-out;
+}
+#typing-notif .typing-indicator {
+  display: flex;
+  float: right;
+}
 .typing-indicator {
-  /* background-color: #e6e7ed; */
+  background-color: gray;
   will-change: transform;
-  border-radius: 2px 13px 13px 13px;
-  display: block;
+  height: 20px;
+  width: 40px;
+  border-radius: 7px 7px 7px 2px;
   flex-flow: row nowrap;
   margin: 0 auto;
   position: relative;
@@ -236,23 +258,27 @@ a {
   animation: 2s bulge infinite ease-out;
   justify-content: center;
   align-items: center;
-  height: 40px;
-  overflow: auto;
 }
-
-.indicator {
-  width: 150px;
-  overflow-x: auto;
+.blink-soft {
+  animation: blinker 1.5s linear infinite;
 }
-
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
 .typing-indicator span {
-  height: 6px;
-  width: 6px;
-  margin: 0 1px;
-  background-color: #9e9ea1;
+  height: 7px;
+  width: 7px;
+  margin: auto 1px;
+  background-color: whitesmoke;
   display: inline-block;
   border-radius: 50%;
   opacity: 0.4;
+}
+.dash-indicator {
+  height: 10px;
+  margin: auto;
 }
 .typing-indicator span:nth-of-type(1) {
   -webkit-animation: 1s blink infinite 0.3333s;
@@ -266,13 +292,11 @@ a {
   -webkit-animation: 1s blink infinite 0.9999s;
   animation: 1s blink infinite 0.9999s;
 }
-
 @-webkit-keyframes blink {
   50% {
     opacity: 1;
   }
 }
-
 @keyframes blink {
   50% {
     opacity: 1;
@@ -312,16 +336,13 @@ a {
 /* Extra small devices (portrait phones, less than 576px) */
 @media (max-width: 575.98px) {
   body {
-    font-size: 80%;
+    font-size: 95%;
   }
   .btn {
-    font-size: 90%;
+    font-size: 95%;
   }
   .dropdown-menu {
-    font-size: 90%;
-  }
-  .indicator {
-    font-size: 90%;
+    font-size: 95%;
   }
   .chatbox {
     min-width: 300px;
@@ -335,15 +356,15 @@ a {
   }
   ::-webkit-input-placeholder {
     /* Edge */
-    font-size: 80%;
+    font-size: 95%;
   }
 
   :-ms-input-placeholder {
     /* Internet Explorer 10-11 */
-    font-size: 80%;
+    font-size: 95%;
   }
 
   ::placeholder {
-    font-size: 80%;
+    font-size: 95%;
   }
 }

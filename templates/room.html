@@ -1,21 +1,95 @@
 {% include "separate/header.html" %}
+<!-- Typing Modal -->
+<div
+  class="modal fade"
+  id="typingNotifModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-sm modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        Typing Status
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="notif-modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal -->
+
+<!-- Users Modal -->
+<div
+  class="modal fade"
+  id="userNotifModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-sm modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        User List
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="user-modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Modal -->
 <section class="chatbox">
   <header class="chatbox-header">
     <div class="chatbox-header-title">
       <i class="fas fa-comment-alt"></i>
       <strong>Cochalate v.1.1</strong><br />
-      <div class="typing-indicator mt-1"></div>
     </div>
-    <div class="chatbox-header-options">
+    <div class="chatbox-header-options d-flex">
+      <a
+        href="#typingNotifModal"
+        data-bs-toggle="modal"
+        data-bs-target="#typingNotifModal"
+      >
+        <div id="typing-notif">
+          <i class="fa-solid fa-user-large fa-lg mt-3 me-2 icon-user"></i>
+          <div class="typing-indicator"></div>
+        </div>
+      </a>
       <div class="dropdown">
         <a href="#" id="dropdownMenuLink" data-bs-toggle="dropdown">
           <i class="fas fa-gear fa-lg ms-2" style="color: gray"></i>
         </a>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
           <li class="dropdown-item">room : {{code_room}}</li>
-          <li class="dropdown-item">username : {{session['username']}}</li>
-          <li class="dropdown-item">
-            online user : <span id="users_username"></span>
+          <li class="dropdown-item">my username : {{session['username']}}</li>
+          <li>
+            <a
+              class="dropdown-item"
+              href="#userNotifModal"
+              data-bs-toggle="modal"
+              data-bs-target="#userNotifModal"
+              >Users List</a
+            >
           </li>
           <li>
             <a class="dropdown-item" href="/logout"
@@ -56,9 +130,9 @@
     </button>
   </div>
 </section>
-{% include "separate/footer.html" %}
+
 <script type="text/javascript" charset="utf-8">
-  var socket = io("192.168.1.6:5000");
+  var socket = io();
 
   //==========================================================================================
   //===================== HANDLING DISCONNECT MESSAGE ========================================
@@ -82,7 +156,6 @@
       username: "Chocalate Server",
       msg: "{{session['username']}}" + " had left the room",
       time: datetime,
-      users_username: $("#users_username").text(),
     });
   };
   //==================================END=====================================================
@@ -130,34 +203,49 @@
       $("#chatbox-chat").append(content);
     }
 
-    if (typeof data.users_username == Array) {
+    if (Array.isArray(data.users_username)) {
       let txt = "";
       data.users_username.forEach(accessing_array);
 
       let string_length = txt.length;
-      let result = txt.substr(0, string_length - 1);
+      let result = txt.substr(0, string_length - 5);
 
-      $("#users_username").text(result);
+      $(".user-modal-body").html(result);
 
       function accessing_array(value) {
-        txt += value + ",";
+        txt +=
+          '<div class="ms-1 mb-1 border d-flex"><i class="m-1 fa-solid fa-user"></i><p>' +
+          value +
+          "</p></div><br/>";
       }
     } else {
-      $("#users_username").text(data.users_username);
+      $(".user-modal-body").html(
+        '<div class="ms-1 mb-1 border"><i class="m-1 fa-solid fa-user"></i><p>' +
+          data.users_username +
+          "</p></div><br/>"
+      );
     }
     $(".msg").last()[0].scrollIntoView();
 
     indicator =
-      '<div class="indicator" id="' +
+      '<div class="indicator ms-2 blink-soft" id="' +
       data.username +
       '"><small>&nbsp;' +
       data.username +
       " is typing.</small></div>";
 
+    span_typing =
+      "<div id='dash-indicator'><span></span><span></span><span></span></div>";
+
     if (data.status == "now typing") {
-      $(".typing-indicator").append(indicator);
+      $(".notif-modal-body").append(indicator);
+      $(".typing-indicator").append(span_typing);
+      $("#typing-notif").css("display", "inline-block");
     } else if (data.status == "done typing") {
       $("#" + data.username).remove();
+      $("#dash-indicator").remove();
+      //$("#typing-notif").css("display", "none"); #}
+      // $("#typingNotifModal").modal("hide");
     }
   });
   //==================================END=====================================================
@@ -188,7 +276,6 @@
         username: '{{session["username"]}}',
         msg: $("#message").val(),
         time: datetime,
-        users_username: $("#users_username").text(),
       });
       $("#message").val("");
     }
@@ -266,3 +353,4 @@
   //===================== TAB AT TEXT AREA ===================================================
   //==========================================================================================
 </script>
+{% include "separate/footer.html" %}
