@@ -1,1 +1,0 @@
-{"members": 0, "users_username": [], "content": [{"username": "Chocalate Server", "msg": "ivan.2 has joined the room", "time": "08/14/23-23:42:55", "users_username": []}, {"username": "Chocalate Server", "msg": "ivan.2 has left the room", "time": "08/14/23-23:42:55", "users_username": []}]}

@@ -49,6 +49,8 @@ def auth():
                     return render_template("auth.html", error="Please enter a username.", code_room=code_room, username=username)
                 elif len(username)>50:
                     return render_template("auth.html", error="Max username's character is 50.", code_room=code_room, username=username)
+                elif ' ' in username:
+                    return render_template("auth.html", error="Username cannot contain space character", code_room=code_room, username=username)
                 elif not code_room:
                     return render_template("auth.html", error="Please enter a code room.", code_room=code_room, username=username)
                 elif len(code_room)<6 or len(code_room)>6:
@@ -108,7 +110,6 @@ def handle_message(message_file):
     global rooms
     message_file['msg'] = message_file['msg'].replace('\n', '<br/>')
     message_file['msg'] = message_file['msg'].replace('\t', '&nbsp;&nbsp;&nbsp;&nbsp;')
-    # message_file['users_username'] = rooms[room]['users_username']
     room = session.get("room")
     if room not in rooms:
         return
@@ -150,19 +151,21 @@ def disconnect(data):
         print('cannot delete username!')
     if room in rooms:
         rooms[room]["members"] -= 1
-        message_file = {'username': 'Chocalate Server', 'msg': username+' has left the room', 'time': current_time, 'users_username':rooms[room]['users_username']}
-        socket_io.send(message_file, to=room);
+        message_file = {'username': 'Chocalate Server', 'msg': username +' has left the room', 'time': current_time, 'users_username':rooms[room]['users_username']}
+        socket_io.send(message_file, to=room)
         leave_room(room)
         rooms[room]['content'].append(message_file)
         if rooms[room]["members"] <= 0:
             pth_current_time =  (str(current_time)).replace(':','_')
             pth_current_time =  pth_current_time.replace('/','_')
             message_file_name = "message_history/"+pth_current_time+'_message_.txt'
+            '''
             try:
                 with open(message_file_name, 'w') as convert_file:
                     convert_file.write(json.dumps(rooms[room]))
             except Exception as e:
                 print(e)
+            '''
             del rooms[room]
             return redirect(url_for('auth'))
 
