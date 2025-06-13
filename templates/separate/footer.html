@@ -1,8 +1,9 @@
 </div>
 <script>
-  function generate_room(min,max){
-    code = Math.floor(Math.random() * (max-min) ) + min;
-    document.getElementById('code_room').value=code;
+  // Fungsi untuk generate kode room acak
+  function generate_room(min, max) {
+    const code = Math.floor(Math.random() * (max - min)) + min;
+    document.getElementById('code_room').value = code;
   }
 </script>
 </body>

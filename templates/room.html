@@ -1,11 +1,23 @@
 {% include "separate/header.html" %}
-<!-- Typing Modal -->
-<div class="modal fade" id="typingNotifModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+
+<!-- Modal untuk status mengetik -->
+<div
+  class="modal fade"
+  id="typingNotifModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog modal-sm modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         Typing Status
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
       </div>
       <div class="notif-modal-body"></div>
       <div class="modal-footer">
@@ -16,15 +28,25 @@
     </div>
   </div>
 </div>
-<!-- Modal -->
 
-<!-- Users Modal -->
-<div class="modal fade" id="userNotifModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Modal untuk daftar user -->
+<div
+  class="modal fade"
+  id="userNotifModal"
+  tabindex="-1"
+  aria-labelledby="exampleModalLabel"
+  aria-hidden="true"
+>
   <div class="modal-dialog modal-sm modal-dialog-scrollable">
     <div class="modal-content">
       <div class="modal-header">
         User List
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
       </div>
       <div class="user-modal-body"></div>
       <div class="modal-footer">
@@ -35,7 +57,8 @@
     </div>
   </div>
 </div>
-<!-- Modal -->
+
+<!-- Chatbox utama -->
 <section class="chatbox">
   <header class="chatbox-header">
     <div class="chatbox-header-title">
@@ -43,12 +66,17 @@
       <strong>Cochalate v.1.1</strong><br />
     </div>
     <div class="chatbox-header-options d-flex">
-      <a href="#typingNotifModal" data-bs-toggle="modal" data-bs-target="#typingNotifModal">
+      <!-- Tombol modal status mengetik -->
+      <a
+        href="#typingNotifModal"
+        data-bs-toggle="modal"
+        data-bs-target="#typingNotifModal"
+      >
         <div id="typing-notif">
           <i class="fa-solid fa-keyboard fa-lg mt-3 me-2 icon-user"></i>
-          <!-- <div class="typing-indicator"></div> -->
         </div>
       </a>
+      <!-- Dropdown menu pengaturan -->
       <div class="dropdown">
         <a href="#" id="dropdownMenuLink" data-bs-toggle="dropdown">
           <i class="fas fa-gear mt-3 fa-lg ms-2" style="color: gray"></i>
@@ -57,20 +85,30 @@
           <li class="dropdown-item">room : {{code_room}}</li>
           <li class="dropdown-item">my username : {{session['username']}}</li>
           <li>
-            <a class="dropdown-item" href="#userNotifModal" data-bs-toggle="modal"
-              data-bs-target="#userNotifModal">Users List</a>
+            <a
+              class="dropdown-item"
+              href="#userNotifModal"
+              data-bs-toggle="modal"
+              data-bs-target="#userNotifModal"
+              >Users List</a
+            >
           </li>
           <li>
-            <a class="dropdown-item" href="/logout"><i class="fas fa-right-from-bracket"></i>&nbsp;Log Out</a>
+            <a class="dropdown-item" href="/logout">
+              <i class="fas fa-right-from-bracket"></i>&nbsp;Log Out
+            </a>
           </li>
         </ul>
       </div>
     </div>
   </header>
+
+  <!-- Area chat -->
   <main class="chatbox-chat" id="chatbox-chat">
-    {%if messages%} {%for msg in messages%}
+    {% if messages %} {% for msg in messages %}
     <div
-      class="msg {{'left-msg' if (msg['username'] != session['username']) else 'right-msg'}} {{'server' if msg['username']=='Chocalate Server'}}">
+      class="msg {{'left-msg' if (msg['username'] != session['username']) else 'right-msg'}} {{'server' if msg['username']=='Chocalate Server'}}"
+    >
       <div class="msg-bubble">
         <div class="msg-info">
           <div class="msg-info-name">{{msg['username']}}</div>
@@ -79,18 +117,25 @@
         <div class="msg-text">{{msg['msg']}}</div>
       </div>
     </div>
-    {%endfor%} {%endif%}
+    {% endfor %} {% endif %}
     <div id="bottom"></div>
   </main>
 
+  <!-- Input pesan -->
   <div class="chatbox-inputarea">
-    <textarea type="text" class="chatbox-input" placeholder="Enter your message..." id="message"></textarea>
+    <textarea
+      type="text"
+      class="chatbox-input"
+      placeholder="Enter your message..."
+      id="message"
+    ></textarea>
     <button type="button" class="chatbox-send-btn" onclick="SendMessage()">
       <i class="fa-solid fa-paper-plane"></i>
     </button>
   </div>
 </section>
 
+<!-- Variabel username untuk JS -->
 <script>
   var username_user = '{{session["username"]}}';
 </script>
