@@ -84,10 +84,17 @@ socket.on("message", function (data) {
   if (data.status == "now typing") {
     $(".notif-modal-body").append(indicator);
     $(".typing-indicator").append(span_typing);
-    $("#typing-notif").css("display", "inline-block");
+    $("#typing-notif").css("display", "inline-block"); // Tampilkan ikon
+    if ($(".notif-modal-body .blink-soft").length > 0) {
+      $("#typing-notif").addClass("blink-soft");
+    }
   } else if (data.status == "done typing") {
     $("#" + data.username).remove();
     $("#dash-indicator").remove();
+    if ($(".notif-modal-body .blink-soft").length === 0) {
+      $("#typing-notif").removeClass("blink-soft");
+      $("#typing-notif").css("display", "none"); // Sembunyikan ikon
+    }
     //$("#typing-notif").css("display", "none");
     //$("#typingNotifModal").modal("hide");
   }
@@ -96,6 +103,11 @@ socket.on("message", function (data) {
 // ===================== FUNCTION TO SEND MESSAGE ======================
 // Fungsi kirim pesan ke server
 function SendMessage() {
+  const btn = document.querySelector(".chatbox-send-btn");
+  btn.classList.remove("animated"); // reset jika animasi masih berjalan
+  void btn.offsetWidth; // force reflow
+  btn.classList.add("animated");
+
   var currentdate = new Date();
   var datetime =
     currentdate.getDate() +

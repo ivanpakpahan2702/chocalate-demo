@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from flask_socketio import SocketIO, emit, send, join_room, leave_room
 from datetime import datetime, timedelta
 import json
+import os
+import base64
 
 # Inisialisasi waktu saat ini
 now = datetime.now()
@@ -14,6 +16,20 @@ socket_io = SocketIO(app, cors_allowed_origins="*")
 
 # Dictionary untuk menyimpan data room
 rooms = {}
+UPLOAD_FOLDER = 'static/uploads'
+
+def save_image(room, image_b64):
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
+    room_folder = os.path.join(UPLOAD_FOLDER, room)
+    if not os.path.exists(room_folder):
+        os.makedirs(room_folder)
+    # Simpan file unik
+    filename = datetime.now().strftime('%Y%m%d%H%M%S%f') + '.png'
+    filepath = os.path.join(room_folder, filename)
+    with open(filepath, 'wb') as f:
+        f.write(base64.b64decode(image_b64.split(',')[1]))
+    return '/' + filepath.replace('\\', '/')
 
 @app.before_request
 def make_session_permanent():
@@ -116,9 +132,13 @@ def handle_message(message_file):
         del rooms[room]
         return redirect(url_for('auth'))
     try:
+        # Simpan gambar jika ada
+        if message_file.get('image'):
+            image_url = save_image(room, message_file['image'])
+            message_file['image'] = image_url
         send(message_file, to=room)
         # Simpan pesan jika ada isinya
-        if (message_file['msg'] != '') or message_file['msg'] != None:
+        if (message_file['msg'] != '') or message_file.get('image'):
             rooms[room]['content'].append(message_file)
     except:
         return

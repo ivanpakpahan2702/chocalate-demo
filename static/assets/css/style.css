@@ -146,7 +146,8 @@ a {
   height: 50px;
 }
 
-.chatbox-header-title {}
+.chatbox-header-title {
+}
 
 .chatbox-chat {
   flex: 1;
@@ -170,6 +171,7 @@ a {
   display: flex;
   align-items: flex-end;
   margin-bottom: 10px;
+  animation: fadeInUp 0.7s ease;
 }
 
 .msg:last-of-type {
@@ -267,6 +269,16 @@ a {
   background: rgb(0, 180, 50);
 }
 
+.chatbox-send-btn.animated {
+  animation: sendBtnClick 0.2s;
+}
+
+@keyframes sendBtnClick {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
 .chatbox-chat {
   background-color: #fcfcfe;
   background: url("/static/assets/Images/output-onlinepngtools.png");
@@ -307,6 +319,15 @@ a {
 
 .blink-soft {
   animation: blinker 1.5s linear infinite;
+}
+
+.typing-notif.blink-soft {
+  animation: blinkSoft 1s infinite;
+}
+
+@keyframes blinkSoft {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
 }
 
 @keyframes blinker {
@@ -366,6 +387,23 @@ a {
 @keyframes bulge {
   50% {
     transform: scale(1.05);
+  }
+}
+
+/* Add this CSS for animation */
+/* You can adjust the animation as needed */
+.msg {
+  animation: fadeInUp 0.7s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
